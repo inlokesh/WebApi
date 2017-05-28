@@ -37,16 +37,16 @@ namespace WebApi.Controllers
             // Create a customer entity and add it to the table.
             DeviceEntity device1 = new DeviceEntity();
             device1.DeviceID = 1;
-            device1.DeviceName = "HallWayCamera";
+            device1.DeviceName = "Vacation Home Camera 1";
             device1.Type = DeviceType.Camera;
             device1.AssignPartitionKey();
             device1.AssignRowKey();
 
             // Create another customer entity and add it to the table.
             DeviceEntity device2 = new DeviceEntity();
-            device2.DeviceID = 3;
-            device2.DeviceName = "HallwaySecurityPanel";
-            device2.Type = DeviceType.SecurityPanel;
+            device2.DeviceID = 2;
+            device2.DeviceName = "City Home Thermostat 1";
+            device2.Type = DeviceType.Thermostat;
             device2.AssignPartitionKey();
             device2.AssignRowKey();
 
@@ -64,18 +64,54 @@ namespace WebApi.Controllers
             }
         }
 
+        public void RemoveDevices()
+        {
+            // Create the batch operation.
+            TableBatchOperation batchOperation = new TableBatchOperation();
+
+            // Create a device entity and add it to the table.
+            DeviceEntity device1 = new DeviceEntity();
+            device1 = RetrieveRecord(devicesTable, DeviceType.Camera.ToString(), "1");
+
+            // Create another device entity and add it to the table.
+            DeviceEntity device2 = new DeviceEntity();
+            device2 = RetrieveRecord(devicesTable, DeviceType.Camera.ToString(), "2");
+
+            // Create another customer entity and add it to the table.
+            DeviceEntity device3 = new DeviceEntity();
+            device3 = RetrieveRecord(devicesTable, DeviceType.Camera.ToString(), "3");
+
+            if (device1 != null)
+            {
+                TableOperation tableOperation = TableOperation.Delete(device1);
+                devicesTable.Execute(tableOperation);
+            }
+
+            if (device2 != null)
+            {
+                TableOperation tableOperation = TableOperation.Delete(device2);
+                devicesTable.Execute(tableOperation);
+            }
+
+            if (device3 != null)
+            {
+                TableOperation tableOperation = TableOperation.Insert(device3);
+                devicesTable.Execute(tableOperation);
+            }
+        }
+
         public DeviceEntity RetrieveRecord(CloudTable table, string partitionKey, string rowKey)
         {
             TableOperation tableOperation = TableOperation.Retrieve<DeviceEntity>(partitionKey, rowKey);
             TableResult tableResult = table.Execute(tableOperation);
             return tableResult.Result as DeviceEntity;
         }
-        public List<DeviceEntity> GetAllDevices()
+        public List<Device> GetAllDevices()
         {
             // Construct the query operation for all customer entities where PartitionKey="Smith".
             TableQuery<DeviceEntity> query = new TableQuery<DeviceEntity>();
             //Declare Result object
-            List<DeviceEntity> result = new List<DeviceEntity>();
+            List<Device> result = new List<Device>();
 
             // Print the fields for each customer.
             TableContinuationToken token = null;
@@ -86,7 +122,7 @@ namespace WebApi.Controllers
 
                 foreach (DeviceEntity entity in resultSegment.Results)
                 {
-                    result.Add(entity);
+                    result.Add(entity.ToDevice());
                 }
             } while (token != null);
             return result;

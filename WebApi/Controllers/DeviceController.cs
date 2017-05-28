@@ -11,10 +11,12 @@ namespace WebApi.Controllers
     public class DeviceController : ApiController
     {
         // GET: api/Device
-        public List<DeviceEntity> Get()
+        [Route("GetAllDevices")]
+        public List<Device> Get()
         {
             var tableController = new TableStorageController();
             tableController.Init();
+            tableController.RemoveDevices();
             tableController.InsertDeviceAsync();
             var result = tableController.GetAllDevices();
             return result;
