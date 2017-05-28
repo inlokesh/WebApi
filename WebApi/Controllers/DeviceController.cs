@@ -16,10 +16,7 @@ namespace WebApi.Controllers
         {
             var tableController = new TableStorageController();
             tableController.Init();
-            tableController.RemoveDevices();
-            tableController.InsertDeviceAsync();
-            var result = tableController.GetAllDevices();
-            return result;
+            return tableController.GetAllDevices();
         }
 
         // GET: api/Device/5
@@ -31,6 +28,10 @@ namespace WebApi.Controllers
         // POST: api/Device
         public void Post([FromBody]string value)
         {
+            var tableController = new TableStorageController();
+            tableController.Init();
+            tableController.RemoveDevices();
+            tableController.InsertDeviceAsync();
         }
 
         // PUT: api/Device/5
